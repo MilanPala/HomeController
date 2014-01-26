@@ -1,0 +1,5 @@
+RewriteEngine On
+
+RewriteRule ^data/status$ /data.php?action=status [QSA,L]
+
+RewriteRule ^data/(r|s)/([0-1])$ /data.php?action=$1&value=$2 [QSA,L]

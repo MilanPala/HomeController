@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Ovládání domácnosti</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+		<style>
+			body { padding-top: 70px; }
+			#light, #temperature { text-align: right; }
+			input { background: #fff !important; }
+			#error { display: none; }
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<span class="navbar-brand">Ovládání domácnosti</span>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div id="error">
+				<p class="alert alert-danger"></p>
+			</div>
+
+			<div class="input-group input-group-lg">
+				<span class="input-group-addon">Osvětlení</span>
+				<input type="text" class="form-control" id="light" readonly="readonly">
+				<span class="input-group-addon">%</span>
+			</div>
+			<br>
+			<div class="input-group input-group-lg">
+				<span class="input-group-addon">Teplota</span>
+				<input type="text" class="form-control" id="temperature" readonly="readonly">
+				<span class="input-group-addon">°C</span>
+			</div>
+			<br>
+			<form>
+				<div class="input-group input-group-lg">
+					<span class="input-group-addon">Relé A</span>
+					<input type="text" class="form-control" id="relayA" readonly="readonly">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-success" id="relayA-button">Zapnout</button>
+					</span>
+				</div>
+			</form>
+			<br>
+			<form>
+				<div class="input-group input-group-lg">
+					<span class="input-group-addon">Relé B</span>
+					<input type="text" class="form-control" id="relayB" readonly="readonly">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-success" id="relayB-button">Zapnout</button>
+					</span>
+				</div>
+			</form>
+		</div>
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="jquery-2.0.3.min.js"></script>
+		<script src="jshashtable-3.0.js"></script>
+		<script src="jquery.numberformatter-1.2.4.min.js"></script>
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script src="js/bootstrap.min.js"></script>
+
+		<script>
+			setInterval(function() {
+				$.ajax({
+					dataType: "json",
+					context: document.body,
+					url: "/data.php?action=status",
+					cache: false,
+					crossDomain: true,
+					success: function(data) {
+						$('#error').hide(300);
+						processInput(data);
+					},
+					error: function(xhr, status, error) {
+						showError("Chyba aktualizace stavu: " + xhr.status);
+					},
+				});
+			}, 2000);
+
+			$('#relayA-button').click(function() {
+				$.getJSON("/data.php?action=r&value=" + ($('#relayA').val() == "Zapnuto" ? "0" : "1"), function(data) {
+					processInput(data);
+				});
+			});
+
+			$('#relayB-button').click(function() {
+				$.getJSON("/data.php?action=s&value=" + ($('#relayB').val() == "Zapnuto" ? "0" : "1"), function(data) {
+					processInput(data);
+				});
+			});
+
+			function processInput(data) {
+				$.each(data, function(key, val) {
+					if (key == "relayA" || key == "relayB") {
+						$('#' + key + "-button").text(val ? "Vypnout" : "Zapnout");
+						$('#' + key + "-button").toggleClass("active", Boolean(val));
+						$('#' + key + "-button").toggleClass("btn-success", !Boolean(val));
+						$('#' + key + "-button").toggleClass("btn-danger", Boolean(val));
+						$('#' + key).val(val ? "Zapnuto" : "Vypnuto");
+					} else if (key == "temperature") {
+						$('#' + key).val(val);
+						$('#' + key).formatNumber({format: "###.00", locale: "cz"});
+					} else {
+						$('#' + key).val(val);
+					}
+				});
+			}
+
+			function showError(text) {
+				$('#error p').text(text);
+				$('#error').show(300);
+			}
+		</script>		
+	</body>
+</html>
