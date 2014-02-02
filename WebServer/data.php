@@ -3,7 +3,14 @@
 $action = isset($_GET['action']) ? $_GET['action'] : NULL;
 $value = isset($_GET['value']) ? $_GET['value'] : NULL;
 
-$url = 'http://localhost:8085';
+$config = array();
+if (file_exists('config.ini.local')) $config = parse_ini_file('config.ini.local');
+if (!$config)
+{
+	$config['port'] = 8080;
+}
+
+$url = 'http://localhost:' . $config['port'];
 
 $data = NULL;
 
@@ -35,8 +42,8 @@ else
 	header("HTTP/1.1 404 Not Found");
 	header('Content-type: text/plain');
 
-	var_dump($_GET);
+	print_r($config);
 
-	var_dump($_SERVER);
+	print_r($_GET);
 }
 exit;

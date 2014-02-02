@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.BindException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Timer;
@@ -54,12 +55,13 @@ public class MainWindow extends javax.swing.JFrame implements ArduinoDataEventLi
 
 		try {
 			this.server = new ArduinoServer(arduino, serverPortNumber);
-		} catch (IOException ex) {
-			Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (BindException ex) {
 			JOptionPane.showMessageDialog(this,
-					"Nepodařilo se spustit webový server.",
+					"Nepodařilo se spustit webový server, port " + serverPortNumber + " je již obsazen.",
 					"Chyba spuštění serveru",
 					JOptionPane.ERROR_MESSAGE);
+		} catch (IOException ex) {
+			Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		this.arduino.addArduinoDataEventListener(this.server);
 		this.arduino.write("u:1");

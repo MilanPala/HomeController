@@ -10,7 +10,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class PortSelectDialog extends javax.swing.JDialog
 {
@@ -18,24 +20,31 @@ public class PortSelectDialog extends javax.swing.JDialog
 	private javax.swing.JButton connectButton;
 	private javax.swing.JLabel jlPortName;
 	private javax.swing.JComboBox portsBox;
+	private JTextField serverPortInput;
 
 	public static PortSelectDialog dialog;
 
 	private final PortSelectDialogActionListener listener;
 
-	public PortSelectDialog(PortSelectDialogActionListener listener)
+	public PortSelectDialog(PortSelectDialogActionListener listener, int serverPort)
 	{
 		this.listener = listener;
-		initComponents();
+		initComponents(serverPort);
 	}
 
-	private void initComponents()
+	private void initComponents(int serverPort)
 	{
 		jlPortName = new javax.swing.JLabel();
-		jlPortName.setText("Název portu:");
+		jlPortName.setText("Port Arduina:");
 
 		portsBox = new javax.swing.JComboBox();
 		portsBox.setModel(getPortsNames());
+
+		JLabel serverPortLabel = new javax.swing.JLabel();
+		serverPortLabel.setText("Port webového serveru:");
+
+		serverPortInput = new JTextField(String.valueOf(serverPort));
+		serverPortInput.setColumns(5);
 
 		connectButton = new javax.swing.JButton();
 		connectButton.setText("Připojit");
@@ -62,6 +71,10 @@ public class PortSelectDialog extends javax.swing.JDialog
 		panel.add(Box.createRigidArea(new Dimension(5, 0)));
 		panel.add(portsBox);
 		panel.add(Box.createRigidArea(new Dimension(5, 0)));
+		panel.add(serverPortLabel);
+		panel.add(Box.createRigidArea(new Dimension(5, 0)));
+		panel.add(serverPortInput);
+		panel.add(Box.createRigidArea(new Dimension(5, 0)));
 		panel.add(connectButton);
 
 		getContentPane().add(panel);
@@ -82,9 +95,9 @@ public class PortSelectDialog extends javax.swing.JDialog
 		return new javax.swing.DefaultComboBoxModel(portsNames);
 	}
 
-	public static void showDialog(PortSelectDialogActionListener listener)
+	public static void showDialog(PortSelectDialogActionListener listener, int serverPort)
 	{
-		dialog = new PortSelectDialog(listener);
+		dialog = new PortSelectDialog(listener, serverPort);
 		dialog.setTitle("Vyberte port Arduina");
 		dialog.setVisible(true);
 		dialog.setLocationRelativeTo(null);
@@ -93,6 +106,11 @@ public class PortSelectDialog extends javax.swing.JDialog
 	public JComboBox getPortsBox()
 	{
 		return portsBox;
+	}
+
+	public int getServerPort()
+	{
+		return Integer.parseInt(serverPortInput.getText());
 	}
 
 	private void buttonActionListener(ActionEvent e)

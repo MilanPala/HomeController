@@ -72,7 +72,7 @@ public class StartUp
 							SerialPort port = (SerialPort) portId.open(this.getClass().getName(), TIME_OUT);
 
 							dialog.dispose();
-							new MainWindow(port, serverPort).setVisible(true);
+							new MainWindow(port, dialog.getServerPort()).setVisible(true);
 						} catch (NoSuchPortException ex) {
 							Logger.getLogger(PortSelectDialog.class.getName()).log(Level.SEVERE, null, ex);
 						} catch (PortInUseException ex) {
@@ -83,7 +83,7 @@ public class StartUp
 						}
 
 					}
-				});
+				}, serverPort);
 			}
 		}
 		);
